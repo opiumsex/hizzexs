@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой сайт</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            color: white;
+        }
+        
+        #video-background {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .username {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            animation: glow 2s infinite alternate;
+        }
+        
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .link-button {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .link-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .link-button:active {
+            transform: scale(0.98);
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #e60073, 0 0 20px #e60073;
+            }
+            to {
+                text-shadow: 0 0 10px #fff, 0 0 15px #ff4da6, 0 0 20px #ff4da6, 0 0 25px #ff4da6;
+            }
+        }
+        
+        /* Стили для мини-плеера */
+        .mini-player {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 15px;
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .player-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        .player-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .player-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .song-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .song-cover {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            object-fit: cover;
+            background: #333;
+        }
+        
+        .song-title {
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-grow: 1;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #fff;
+            border-radius: 5px;
+            width: 0%;
+            position: relative;
+        }
+        
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .volume-slider {
+            width: 80px;
+            height: 5px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        /* Запрет выделения текста */
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Видео фон -->
+    <video autoplay muted loop id="video-background">
+        <source src="./hizzex_site/font.mp4" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+    </video>
+    
+    <!-- Основное содержимое -->
+    <div class="content">
+        <!-- Аватарка -->
+        <img src="./hizzex_site/avatar.jpg" alt="Аватар" class="avatar" onerror="this.style.display='none'">
+        
+        <!-- Никнейм -->
+        <h1 class="username">ВашНикнейм</h1>
+        
+        <!-- Кнопки-ссылки -->
+        <div class="buttons-container">
+            <a href="https://example.com/link1" class="link-button">Название ссылки 1</a>
+            <a href="https://example.com/link2" class="link-button">Название ссылки 2</a>
+            <a href="https://example.com/link3" class="link-button">Название ссылки 3</a>
+            <a href="https://example.com/link4" class="link-button">Название ссылки 4</a>
+            <a href="https://example.com/link5" class="link-button">Название ссылки 5</a>
+        </div>
+    </div>
+    
+    <!-- Мини-плеер -->
+    <div class="mini-player no-select">
+        <div class="song-info">
+            <img src="" class="song-cover" id="song-cover" onerror="this.style.display='none'">
+            <div class="song-title" id="song-title">Пустой вокзал</div>
+        </div>
+        
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <div class="time-info">
+            <span id="current-time">0:00</span>
+            <span id="duration">0:00</span>
+        </div>
+        <div class="player-controls">
+            <button class="player-btn" id="prev-btn">⏮</button>
+            <button class="player-btn" id="play-btn">▶</button>
+            <button class="player-btn" id="next-btn">⏭</button>
+            
+            <div class="volume-container">
+                <button class="player-btn" id="volume-btn">🔊</button>
+                <input type="range" min="0" max="1" step="0.01" value="0.5" class="volume-slider" id="volume-slider">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Аудио элемент (скрыт) -->
+    <audio id="audio-player"></audio>
+    
+    <script>
+        // Запрет контекстного меню (правой кнопки мыши)
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        // Запрет горячих клавиш
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey  e.altKey  e.metaKey) {
+                e.preventDefault();
+            }
+        });
+        
+        // Мини-плеер
+        document.addEventListener('DOMContentLoaded', function() {
+            const audioPlayer = document.getElementById('audio-player');
+            const playBtn = document.getElementById('play-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const progressBar = document.getElementById('progress-bar');
+            const progressContainer = document.getElementById('progress-container');
+            const currentTimeEl = document.getElementById('current-time');
+            const durationEl = document.getElementById('duration');
+            const volumeBtn = document.getElementById('volume-btn');
+            const volumeSlider = document.getElementById('volume-slider');
+            const songTitle = document.getElementById('song-title');
+            const songCover = document.getElementById('song-cover');
+            
+            // Список песен (добавьте свои файлы)
+            const songs = [
+                { 
+                    title: "Песня 1", 
+                    file: "./music.mp3",
+                    cover: "cover1.jpg" 
+                },
+                { 
+                    title: "Песня 2", 
+                    file: "./music1.mp3",
+                    cover: "cover2.jpg" 
+                }
+            ];
+            
+            let currentSongIndex = 0;
+            let isPlaying = false;
+            
+            // Загрузка песни
+            function loadSong(song) {
+                songTitle.textContent = song.title;
+                audioPlayer.src = song.file;
+                
+                if (song.cover) {
+                    songCover.src = song.cover;
+                    songCover.style.display = 'block';
+                } else {
+                    songCover.style.display = 'none';
+                }
+            }
+            
+            // Воспроизведение/пауза
+            function togglePlay() {
+                if (isPlaying) {
+                    pauseSong();
+                } else {
+                    playSong();
+                }
+            }
+            
+            // Воспроизведение
+            function playSong() {
+                isPlaying = true;
+                playBtn.textContent = '⏸';
+                audioPlayer.play();
+            }
+            
+            // Пауза
+            function pauseSong() {
+                isPlaying = false;
+                playBtn.textContent = '▶';
+                audioPlayer.pause();
+            }
+            
+            // Следующая песня
+            function nextSong() {
+                currentSongIndex = (currentSongIndex + 1) % songs.length;
+                loadSong(songs[currentSongIndex]);
+                if (isPlaying) playSong();
+            }
+            // Предыдущая песня
+            function prevSong() {
+                currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+                loadSong(songs[currentSongIndex]);
+                if (isPlaying) playSong();
+            }
+            
+            // Обновление прогресса
+            function updateProgress(e) {
+                const { duration, currentTime } = e.srcElement;
+                const progressPercent = (currentTime / duration) * 100;
+                progressBar.style.width = ${progressPercent}%;
+                
+                // Форматирование времени
+                const durationMinutes = Math.floor(duration / 60);
+                let durationSeconds = Math.floor(duration % 60);
+                if (durationSeconds < 10) durationSeconds = 0${durationSeconds};
+                
+                if (duration) {
+                    durationEl.textContent = ${durationMinutes}:${durationSeconds};
+                }
+                
+                const currentMinutes = Math.floor(currentTime / 60);
+                let currentSeconds = Math.floor(currentTime % 60);
+                if (currentSeconds < 10) currentSeconds = 0${currentSeconds};
+                
+                currentTimeEl.textContent = ${currentMinutes}:${currentSeconds};
+            }
+            
+            // Перемотка
+            function setProgress(e) {
+                const width = this.clientWidth;
+                const clickX = e.offsetX;
+                const duration = audioPlayer.duration;
+                audioPlayer.currentTime = (clickX / width) * duration;
+            }
+            
+            // Управление громкостью
+            function setVolume() {
+                audioPlayer.volume = volumeSlider.value;
+                
+                // Иконка громкости
+                if (audioPlayer.volume === 0) {
+                    volumeBtn.textContent = '🔇';
+                } else if (audioPlayer.volume < 0.5) {
+                    volumeBtn.textContent = '🔉';
+                } else {
+                    volumeBtn.textContent = '🔊';
+                }
+            }
+            
+            // Переключение mute/unmute
+            function toggleMute() {
+                if (audioPlayer.volume === 0) {
+                    audioPlayer.volume = volumeSlider.value;
+                } else {
+                    audioPlayer.volume = 0;
+                    volumeSlider.value = 0;
+                }
+                setVolume();
+            }
+            
+            // События
+            playBtn.addEventListener('click', togglePlay);
+            prevBtn.addEventListener('click', prevSong);
+            nextBtn.addEventListener('click', nextSong);
+            audioPlayer.addEventListener('timeupdate', updateProgress);
+            audioPlayer.addEventListener('ended', nextSong);
+            progressContainer.addEventListener('click', setProgress);
+            volumeSlider.addEventListener('input', setVolume);
+            volumeBtn.addEventListener('click', toggleMute);
+            
+            // Загрузка первой песни
+            loadSong(songs[currentSongIndex]);
+            
+            // Автовоспроизведение после взаимодействия
+            document.body.addEventListener('click', function() {
+                if (!isPlaying) {
+                    playSong();
+                }
+            }, { once: true });
+        });
+    </script>
+</body>
+</html>
